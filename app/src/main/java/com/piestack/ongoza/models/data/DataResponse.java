@@ -92,9 +92,7 @@ this.county = county;
 }
 
 
-public RealmList<Modality> getModality() {
-return modality;
-}
+public RealmList<Modality> getModality() {return modality;}
 
     @ParcelPropertyConverter(RealmListParcelConverter.class)
 public void setModality(RealmList<Modality> modality) {

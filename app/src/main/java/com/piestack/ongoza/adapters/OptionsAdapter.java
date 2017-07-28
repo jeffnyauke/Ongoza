@@ -100,7 +100,7 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.image);*/
         holder.image.setImageDrawable(resources.getDrawable(getDrawable(position)));
-        holder.frameLayout.setBackgroundColor(getRandomMaterialColor("400"));
+        holder.frameLayout.setBackgroundColor(getRandomMaterialColor("400", position));
         // apply click events
         applyClickEvents(holder, position);
     }
@@ -129,16 +129,16 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
 
         switch (position) {
             case 0:
-                drawable = R.drawable.ic_create_black_24dp;
+                drawable = R.drawable.ic_create;
                 break;
             case 1:
-                drawable = R.drawable.date_icon;
+                drawable = R.drawable.ic_submitted;
                 break;
             case 2:
-                drawable = R.drawable.month_icon;
+                drawable = R.drawable.ic_update;
                 break;
             case 3:
-                drawable = R.drawable.reports_icon;
+                drawable = R.drawable.ic_ip;
                 break;
             case 4:
                 drawable = R.drawable.date_icon;
@@ -179,15 +179,40 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.MyViewHo
     /**
      * chooses a random color from array.xml
      */
-    private int getRandomMaterialColor(String typeColor) {
+    private int getRandomMaterialColor(String typeColor, int position) {
         int returnColor = Color.GRAY;
         int arrayId = mContext.getResources().getIdentifier("mdcolor_" + typeColor, "array", mContext.getPackageName());
 
-        if (arrayId != 0) {
+        //if (arrayId != 0) {
             TypedArray colors = mContext.getResources().obtainTypedArray(arrayId);
-            int index = (int) (Math.random() * colors.length());
-            returnColor = colors.getColor(index, Color.GRAY);
-            colors.recycle();
+            int index = (int) (position);
+            //returnColor = colors.getColor(index, Color.GRAY);
+
+        //}
+
+        switch (position) {
+            case 0:
+                returnColor = colors.getColor(index, Color.GRAY);
+                colors.recycle();
+                break;
+            case 1:
+                returnColor = colors.getColor(index, Color.GRAY);
+                colors.recycle();
+                break;
+            case 2:
+                returnColor = colors.getColor(index, Color.GRAY);
+                colors.recycle();
+                break;
+            case 3:
+                returnColor = colors.getColor(index, Color.GRAY);
+                colors.recycle();
+                break;
+            case 4:
+                returnColor = colors.getColor(index, Color.GRAY);
+                colors.recycle();
+                break;
+            default:
+                returnColor = R.drawable.bg_circle;
         }
         return returnColor;
     }

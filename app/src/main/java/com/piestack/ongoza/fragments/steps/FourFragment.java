@@ -120,12 +120,6 @@ public class FourFragment extends Fragment {
                     sortedResponses = realm.where(ReportResponse.class).findFirstAsync();
                     report = sortedResponses.getReport().last();
 
-                    Toast.makeText(getActivity(), report.getCountyId()+" " +report.getPId() +" "+ report.getSId()
-                            +report.getModalityId()+ report.getSubId() + report.getModeId()
-                            +report.getOipId()+ report.getPdId()
-                            +report.getTravel() + report.getE_needs()+report.getHoursIp(),Toast.LENGTH_SHORT).show();
-
-
                     RequestBody formBody = new FormBody.Builder()
                             .add("id", MyApplication.getInstance().getPrefManager().getUser().getId().toString())
                             .add("county_id",report.getCountyId())

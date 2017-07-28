@@ -16,9 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-
-
         <TextView
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
@@ -36,7 +33,7 @@
 
         <ProgressBar
             android:id="@+id/progressBar2"
-            style="?android:attr/progressBarStyle"
+            style="?android:attr/progressBarStyleSmall"
             android:layout_width="wrap_content"
             android:visibility="invisible"
             android:layout_height="wrap_content"
@@ -62,63 +59,129 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             tools:layout_editor_absoluteY="106dp">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@color/colorAccent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/bdstype"
+                    android:layout_width="match_parent"
+                    android:textColor="@color/white"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/county"
+                    android:layout_marginTop="2dp"
+                    android:layout_width="match_parent"
+                    android:textColor="@color/white"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_marginTop="2dp"
+                    android:id="@+id/partner"
+                    android:layout_width="match_parent"
+                    android:textColor="@color/white"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/card2"
+                android:layout_marginTop="8dp"
+                android:elevation="4dp"
+                app:layout_constraintTop_toBottomOf="@+id/cardView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@+id/cardView"
+                app:layout_constraintEnd_toEndOf="@+id/cardView">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:orientation="vertical"
+                    android:layout_height="match_parent"
                     android:padding="16dp"
-                    android:layout_height="wrap_content">
+                    android:orientation="vertical">
+
 
                     <TextView
-                        android:id="@+id/textView90"
+                        android:id="@+id/textView7343"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:textSize="16sp"
-                        android:text="Form of engagement" />
+                        android:text="Support theme" />
 
                     <Spinner
-                        android:id="@+id/spinner3"
+                        android:layout_marginTop="8dp"
+                        android:id="@+id/spinnerSupport"
+                        android:padding="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+
+
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+
+                android:elevation="4dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/card2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@+id/cardView"
+                app:layout_constraintEnd_toEndOf="@+id/cardView">
+
+                <LinearLayout
+                    android:padding="16dp"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content">
+
+
+                    <TextView
+                        android:id="@+id/textVie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:textSize="16sp"
+                        android:text="Sub-support theme" />
+
+                    <Spinner
+                        android:id="@+id/spinnerSubSupport"
                         android:padding="8dp"
                         android:layout_marginTop="8dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
-
                 </LinearLayout>
+
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
-                android:layout_marginTop="8dp"
                 android:layout_width="match_parent"
-                android:elevation="4dp"
+                android:layout_marginTop="8dp"
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:padding="16dp"
                     android:layout_width="match_parent"
                     android:orientation="vertical"
+                    android:padding="16dp"
                     android:layout_height="wrap_content">
 
+                    <EditText
+                        android:id="@+id/tvBDS"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:maxLength="4"
+                        android:inputType="numberDecimal"
+                        android:paddingTop="8dp"
+                        android:hint="Hours on BDS"
+                        />
 
-            <TextView
-                android:id="@+id/textView7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textSize="16sp"
-                android:text="Select a sub-support theme" />
-
-            <Spinner
-                android:id="@+id/spinner1"
-                android:padding="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
 
                 </LinearLayout>
 
@@ -137,21 +200,139 @@
                     android:orientation="vertical"
                     android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/textView9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Select a support mode"
-                android:textSize="16sp"
-                android:layout_marginTop="16dp"
-                />
+                    <TextView
+                        android:id="@+id/textView9"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Support mode"
+                        android:textSize="16sp"
+                        android:layout_marginTop="16dp"
+                        />
 
-            <Spinner
-                android:id="@+id/spinner2"
-                android:padding="8dp"
-                android:layout_marginTop="8dp"
+                    <Spinner
+                        android:id="@+id/spinnerSM"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_marginTop="8dp"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/textView7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:textSize="16sp"
+                        android:text="Person Delivering" />
+
+                    <Spinner
+                        android:id="@+id/spinnerPD"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/textViewPP"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:textSize="16sp"
+                        android:text="Partner present?" />
+
+                    <Spinner
+                        android:id="@+id/spinnerPP"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/textView90"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:textSize="16sp"
+                        android:text="Form of engagement" />
+
+                    <Spinner
+                        android:id="@+id/spinnerFOE"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+
+
+
+
+
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/tvEM"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Emerging needs"
+                        android:minLines="2"
+                        />
+                    <EditText
+                        android:paddingTop="8dp"
+                        android:id="@+id/tvTravel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:maxLength="4"
+                        android:inputType="numberDecimal"
+                        android:hint="Travel hours in digits"
+                        android:layout_marginTop="8dp"
+                        />
+
 
                 </LinearLayout>
 
@@ -160,7 +341,8 @@
                 android:id="@+id/next_two_weekly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Next"
+                android:text="Submit"
+                android:textColor="@color/icon_tint_selected"
                 android:layout_gravity="right"
                 android:background="?selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -168,6 +350,8 @@
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp" />
+
+
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>
     </ScrollView>

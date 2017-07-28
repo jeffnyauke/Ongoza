@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -23,6 +24,7 @@ import com.piestack.ongoza.models.data.DataResponse;
 import com.piestack.ongoza.models.data.Partner;
 import com.piestack.ongoza.models.data.Report;
 import com.piestack.ongoza.models.data.ReportResponse;
+import com.piestack.ongoza.models.data.SubSupporttheme;
 import com.piestack.ongoza.models.data.SupportTheme;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -48,13 +50,25 @@ public class CountyFragment extends Fragment {
 
     private CountyResponse countyResponse;
     List<County> counties = new ArrayList<>();
+    List<County> fcounties = new ArrayList<>();
 
-    @BindView(R.id.spinner)
+
+    @BindView(R.id.spinnerCounty)
     Spinner sCounties;
+    @BindView(R.id.spinnerPartner)
+    Spinner sPartners;
+    @BindView(R.id.spinnerType)
+    Spinner sType;
     @BindView(R.id.next_one_weekly)
     Button button;
 
+    private String county_id;
+    private String county_name;
+
     Realm realm = null;
+    private List<Partner> partners = null;
+    private List<Partner> partnersF = new ArrayList<>();
+
 
     public CountyFragment() {
         // Required empty public constructor
@@ -77,12 +91,50 @@ public class CountyFragment extends Fragment {
         getActivity().setTitle("Create a new BDA");
         //getActivity().getActionBar().setSubtitle();
 
+        county_id = MyApplication.getInstance().getPrefManager().getUser().getCounty_id().toString();
+        populateSpinnerType();
         OkHttpUtils
                 .get()//
-                .url(Config.countiesUrl)//
+                .url(Config.dataUrl)//
                 .id(101)
                 .build()//
                 .execute(new MyStringCallback());
+
+        sCounties.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                County county = fcounties.get(sCounties.getSelectedItemPosition());
+                county_id = county.getCountyId();
+                populateSpinnerPartners();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                County county = fcounties.get(sCounties.getSelectedItemPosition());
+                county_id = county.getCountyId();
+                populateSpinnerPartners();
+
+            }
+        });
+
+        sType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 0){
+                    //sPartners.setSelection();
+                    populateSpinnerCountiesLocal();
+                }else{
+                    populateSpinnerCounties();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
 
         return view;
@@ -91,10 +143,58 @@ public class CountyFragment extends Fragment {
     @OnClick(R.id.next_one_weekly)
     public void next(){
 
-        County county = counties.get(sCounties.getSelectedItemPosition());
-        String county_id = county.getCountyId();
+        try { // I could use try-with-resources here
+            realm = Realm.getDefaultInstance();
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    if(realm.where(ReportResponse.class).findFirst() == null) {
+                        realm.insert(new ReportResponse());
+                    }
+                }
+            });
+        } finally {
+            if(realm != null) {
+                realm.close();
+            }
+        }
 
-        Fragment fragment  = new OneFragmentExchangeBuilder(county_id).build();
+        Partner partner = partnersF.get(sPartners.getSelectedItemPosition());
+        County county = fcounties.get(sCounties.getSelectedItemPosition());
+
+        final Report report = new Report();
+
+        report.setPId(partner.getPId());
+        report.setPName(partner.getPName());
+        if(sType.getSelectedItemPosition() == 0) {
+            report.setExchange(false);
+            report.setCountyId(county.getCountyId());
+            report.setCountyName(county.getCountyName());
+        }else{
+            report.setExchange(true);
+            report.setCountyId(county.getCountyId());
+            report.setCountyName(county.getCountyName());
+        }
+
+
+        try { // I could use try-with-resources here
+            realm = Realm.getDefaultInstance();
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    ReportResponse sortedResponses = realm.where(ReportResponse.class).findFirst();
+                    sortedResponses.getReport().add(report);
+                }
+            });
+        } finally {
+            if(realm != null) {
+                realm.close();
+            }
+        }
+
+        //Bundle bundle = new Bundle();
+        //bundle.putParcelable("",Parcels.wrap(reportResponse));
+        Fragment fragment  = new TwoFragment();
         changeFragmentProcess(fragment);
     }
 
@@ -113,11 +213,16 @@ public class CountyFragment extends Fragment {
      * Adding spinner data
      * */
     private void populateSpinnerCounties() {
+        fcounties.clear();
         List<String> lables = new ArrayList<String>();
 
         for (int i = 0; i < counties.size(); i++) {
-            lables.add(counties.get(i).getCountyName());
+            if (!counties.get(i).getCountyId().equals(MyApplication.getInstance().getPrefManager().getUser().getCounty_id().toString())) {
+                lables.add(counties.get(i).getCountyName());
+                fcounties.add(counties.get(i));
+            }
         }
+
 
         // Creating adapter for spinner
         final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(),
@@ -134,6 +239,69 @@ public class CountyFragment extends Fragment {
             @Override
             public void run() {
                 sCounties.setAdapter(spinnerAdapter);
+            }
+        });
+    }
+
+    private void populateSpinnerCountiesLocal() {
+        fcounties.clear();
+        if(counties!=null) {
+            List<String> lables = new ArrayList<String>();
+
+            for (int i = 0; i < counties.size(); i++) {
+                if (counties.get(i).getCountyId().equals(MyApplication.getInstance().getPrefManager().getUser().getCounty_id().toString())) {
+                    lables.add(counties.get(i).getCountyName());
+
+                    fcounties.add(counties.get(i));
+                    Log.e(counties.get(i).getCountyName(),MyApplication.getInstance().getPrefManager().getUser().getCounty_id().toString());
+                }
+            }
+
+
+            // Creating adapter for spinner
+            final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(),
+                    android.R.layout.simple_spinner_item, lables);
+
+            // Drop down layout style - list view with radio button
+            spinnerAdapter
+                    .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            // attaching data adapter to spinner
+
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    sCounties.setAdapter(spinnerAdapter);
+                }
+            });
+        }
+    }
+
+    /**
+     * Adding spinner data
+     * */
+    private void populateSpinnerType() {
+        List<String> lables = new ArrayList<String>();
+        lables.add("Local");
+        lables.add("Exchange");
+
+
+        // Creating adapter for spinner
+        final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, lables);
+
+        // Drop down layout style - list view with radio button
+        spinnerAdapter
+                .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                sType.setAdapter(spinnerAdapter);
             }
         });
     }
@@ -204,9 +372,28 @@ public class CountyFragment extends Fragment {
                 Log.e(TAG, "onResponse：complete" + responses);
 
                 Gson gson = new Gson();
-                countyResponse = gson.fromJson(responses, CountyResponse.class);
-                counties = countyResponse.getReport();
-                populateSpinnerCounties();
+                DataResponse dataResponse = gson.fromJson(responses, DataResponse.class);
+                counties = dataResponse.getCounty();
+                populateSpinnerCountiesLocal();
+                partners = dataResponse.getPartner();
+                populateSpinnerPartners();
+
+                final DataResponse update = dataResponse;
+                update.setId(1);
+
+                try { // I could use try-with-resources here
+                    realm = Realm.getDefaultInstance();
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            realm.copyToRealmOrUpdate(update);
+                        }
+                    });
+                } finally {
+                    if(realm != null) {
+                        realm.close();
+                    }
+                }
             }
 
 
@@ -218,6 +405,56 @@ public class CountyFragment extends Fragment {
             Log.e(TAG, "inProgress:" + progress);
             //mProgressBar.setProgress((int) (100 * progress));
         }
+    }
+
+
+    /**
+     * Adding spinner data
+     * */
+    private void populateSpinnerPartners() {
+        List<Partner> filtered = new ArrayList<>();
+        List<String> lablesP = new ArrayList<String>();
+        partnersF.clear();
+
+
+        if(partners != null) {
+            for (Partner partner : partners) {
+                if (Integer.valueOf(partner.getCountyId()) == Integer.valueOf(county_id == null ? MyApplication.getInstance().getPrefManager().getUser().getCounty_id().toString() : county_id)){
+                    filtered.add(partner);
+                }
+            }
+        }
+
+        if(filtered.isEmpty()) {
+            for (int i = 0; i < partners.size(); i++) {
+                lablesP.add(partners.get(i).getPName());
+                partnersF.add(partners.get(i));
+            }
+        }else{
+            for (int i = 0; i < filtered.size(); i++) {
+                lablesP.add(filtered.get(i).getPName());
+                partnersF.add(filtered.get(i));
+            }
+        }
+
+
+        // Creating adapter for spinner
+        final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, lablesP);
+
+        // Drop down layout style - list view with radio button
+        spinnerAdapter
+                .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinne
+
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                sPartners.setAdapter(spinnerAdapter);
+            }
+        });
     }
 
 }

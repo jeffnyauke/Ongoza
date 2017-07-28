@@ -32,7 +32,7 @@
 
             <ProgressBar
                 android:id="@+id/progressBar2"
-                style="?android:attr/progressBarStyle"
+                style="?android:attr/progressBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:visibility="visible"
                 android:layout_height="wrap_content"
@@ -111,7 +111,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:ems="10"
-                            android:inputType="number"
+                            android:inputType="numberDecimal"
                             android:hint="Hours spent"
                             android:layout_marginTop="16dp"
                             />

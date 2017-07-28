@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -25,6 +26,7 @@ import com.piestack.ongoza.models.data.DataResponse;
 import com.piestack.ongoza.models.data.Partner;
 import com.piestack.ongoza.models.data.Report;
 import com.piestack.ongoza.models.data.ReportResponse;
+import com.piestack.ongoza.models.data.SubSupporttheme;
 import com.piestack.ongoza.models.data.SupportTheme;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -50,9 +52,13 @@ public class OneFragmentExchange extends Fragment {
 
     private List<Partner> partners = null;
     private List<SupportTheme> supportThemes = null;
+    private List<SubSupporttheme> subThemes = null;
+    private Report report = null;
 
     @BindView(R.id.progressBar2)
     ProgressBar progressBar;
+    @BindView(R.id.spinner1)
+    Spinner sSubTheme;
 
     @BindView(R.id.spinner)
     Spinner sPartners;
@@ -96,6 +102,19 @@ public class OneFragmentExchange extends Fragment {
                 .build()//
                 .execute(new MyStringCallback());
 
+        sTheme.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                populateSpinnerSubSupportTheme(subThemes);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                populateSpinnerSubSupportTheme(subThemes);
+            }
+        });
+
 
         return view;
     }
@@ -121,11 +140,13 @@ public class OneFragmentExchange extends Fragment {
 
         Partner partner = partners.get(sPartners.getSelectedItemPosition());
         SupportTheme supportTheme = supportThemes.get(sTheme.getSelectedItemPosition());
+        SubSupporttheme subSupporttheme = subThemes.get(sSubTheme.getSelectedItemPosition());
 
         final Report report = new Report();
 
         report.setPId(partner.getPId());
         report.setExchange(county_id != null);
+        report.setSubId(subSupporttheme.getSId());
         report.setCountyId(county_id == null ? MyApplication.getInstance().getPrefManager().getUser().getCounty_id().toString() : county_id);
         report.setSId(supportTheme.getSId());
 
@@ -303,6 +324,8 @@ public class OneFragmentExchange extends Fragment {
                 populateSpinnerPartners();
                 supportThemes = dataResponse.getSupportTheme();
                 populateSpinnerSupportTheme();
+                subThemes = dataResponse.getSubSupporttheme();
+                populateSpinnerSubSupportTheme(subThemes);
 
                 final DataResponse update = dataResponse;
                 update.setId(1);
@@ -342,6 +365,42 @@ public class OneFragmentExchange extends Fragment {
         }catch (JsonSyntaxException ex){
             return false;
         }
+    }
+
+    /**
+     * Adding spinner data
+     * */
+    private void populateSpinnerSubSupportTheme(List<SubSupporttheme> list) {
+        List<String> lables = new ArrayList<String>();
+        List<SubSupporttheme> filtered = new ArrayList<>();
+        if(list != null) {
+            for (SubSupporttheme subSupporttheme : list) {
+                if (Integer.valueOf(subSupporttheme.getSId()) == Integer.valueOf(supportThemes.get(sTheme.getSelectedItemPosition()).getSId())){
+                    filtered.add(subSupporttheme);
+                }
+            }
+        }
+
+        if(filtered.isEmpty()) {
+            for (int i = 0; i < list.size(); i++) {
+                lables.add(list.get(i).getSubName());
+            }
+        }else{
+            for (int i = 0; i < filtered.size(); i++) {
+                lables.add(filtered.get(i).getSubName());
+            }
+        }
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, lables);
+
+        // Drop down layout style - list view with radio button
+        spinnerAdapter
+                .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        sSubTheme.setAdapter(spinnerAdapter);
     }
 
 }

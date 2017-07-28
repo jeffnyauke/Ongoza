@@ -45,6 +45,9 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.1'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
+    compile 'com.github.florent37:singledateandtimepicker:1.1.5'
+    compile 'com.wdullaer:materialdatetimepicker:2.4.0'
 
     compile 'org.parceler:parceler-api:1.1.8'
     annotationProcessor 'org.parceler:parceler:1.1.8'

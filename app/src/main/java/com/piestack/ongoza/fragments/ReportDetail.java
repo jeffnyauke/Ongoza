@@ -15,6 +15,7 @@ import com.piestack.ongoza.R;
 import com.piestack.ongoza.fragments.steps.TwoFragment;
 import com.piestack.ongoza.models.data.Report;
 import com.piestack.ongoza.models.data.ReportResponse;
+import com.piestack.ongoza.utils.DateConverter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,9 +67,9 @@ public class ReportDetail extends Fragment  {
                 public void execute(Realm realm) {
                     ReportResponse dataResponse = realm.where(ReportResponse.class).findFirstAsync();
                     Report report  = dataResponse.getReport().get(Integer.valueOf(id));
-                    textView.setText(report.getPName()+"\n\n"+report.getCountyName()+"\n\n"+report.getSName()+"\n\n"+report
-                    .getSubName()+"\n\n"+report.getModeName()+"\n\n"+report.getModalityName()+"\n\n"+report.getHoursIp()+"\n\n"+report.getE_needs()+"\n\n"+report.getTravel()+"\n\n"+
-                    report.getOipName()+"\n\n"+report.getDor());
+                    textView.setText("Partner name: "+report.getPName()+"\n\n"+"County name: "+report.getCountyName()+"\n\n"+"Support theme: "+report.getSName()+"\n\n"+"Sub-support theme: "+report
+                    .getSubName()+"\n\n"+"Support mode: "+report.getModeName()+"\n\n"+"Modality: "+report.getModalityName()+"\n\n"+"Hours on CBA: "+report.getHoursIp()+"\n\n"+"Emerging needs: "+report.getE_needs()+"\n\n"+"Hours travel"+report.getTravel()+"\n\n"+"Internal Process: "+
+                    report.getOipName()+"\n\n"+"Date of report: "+ DateConverter.toPrettyDate(Long.valueOf(report.getDor())));
                 }
             });
         } finally {

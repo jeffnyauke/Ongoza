@@ -157,13 +157,15 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+//        if (id == R.id.action_settings) {
+//
+//            Intent intent  = new Intent(MainActivity.this, SettingsActivity.class);
+//            startActivity(intent);
+//
+//            return true;
+//        }else
 
-            Intent intent  = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(intent);
-
-            return true;
-        }else if(id == R.id.action_logout){
+            if(id == R.id.action_logout){
             MyApplication.getInstance().logout();
         }
 

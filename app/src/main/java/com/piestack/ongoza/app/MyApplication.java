@@ -54,7 +54,7 @@ public class MyApplication extends Application {
         // Initialize Realm
         Realm.init(mInstance);
         RealmConfiguration config = new RealmConfiguration.Builder()  .name("ongoza.realm")
-                .schemaVersion(7)
+                .schemaVersion(8)
                 .build();
         Realm.setDefaultConfiguration(config);
 

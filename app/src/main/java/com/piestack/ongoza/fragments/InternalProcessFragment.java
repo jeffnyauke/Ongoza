@@ -1,10 +1,9 @@
-package com.piestack.ongoza.fragments.steps;
+package com.piestack.ongoza.fragments;
 
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,7 @@ import com.google.gson.JsonSyntaxException;
 import com.piestack.ongoza.R;
 import com.piestack.ongoza.app.Config;
 import com.piestack.ongoza.app.MyApplication;
-import com.piestack.ongoza.fragments.WeeklyFragment;
+import com.piestack.ongoza.fragments.steps.ThanksFragmentBuilder;
 import com.piestack.ongoza.models.PostResponse;
 import com.piestack.ongoza.models.data.DataResponse;
 import com.piestack.ongoza.models.data.InternalProcess;

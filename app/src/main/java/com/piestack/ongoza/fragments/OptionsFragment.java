@@ -13,13 +13,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.piestack.ongoza.R;
 import com.piestack.ongoza.adapters.OptionsAdapter;
 import com.piestack.ongoza.fragments.steps.CountyFragment;
-import com.piestack.ongoza.fragments.steps.InternalProcessFragment;
-import com.piestack.ongoza.fragments.steps.OneFragmentExchange;
 import com.piestack.ongoza.fragments.steps.OneFragmentLocal;
 import com.piestack.ongoza.models.Options;
 
@@ -67,7 +64,7 @@ public class OptionsFragment extends Fragment implements  OptionsAdapter.Options
 
         Options options1 = new Options();
         options1.setId(1);
-        options1.setTitle("Create New BDA");
+        options1.setTitle("Create New BDS");
         options1.setSubtitle("Record your interactions with various partners");
         options1.setColor(getRandomMaterialColor("400"));
         options1.setPicture(R.drawable.bg_circle);
@@ -76,31 +73,30 @@ public class OptionsFragment extends Fragment implements  OptionsAdapter.Options
 
         Options options2 = new Options();
         options2.setId(2);
-        options2.setTitle("View submitted BDAs");
-        options2.setSubtitle("View all your successfully submitted BDAs");
+        options2.setTitle("CBA reports");
+        options2.setSubtitle("View all your successfully submitted BDSs");
         options2.setColor(getRandomMaterialColor("400"));
         options2.setPicture(R.drawable.bg_circle);
 
         optionsList.add(options2);
 
-        Options options3 = new Options();
-        options3.setId(3);
-        options3.setTitle("Update Pending BDA");
-        options3.setSubtitle("Update your pending interactions with various partners");
-        options3.setColor(getRandomMaterialColor("400"));
-        options3.setPicture(R.drawable.bg_circle);
-
-        optionsList.add(options3);
-
-
         Options options4 = new Options();
         options4.setId(3);
         options4.setTitle("Internal Process");
-        options4.setSubtitle("Record the various internal processes of the business");
+        options4.setSubtitle("Record Ongoza Internal Processes");
         options4.setColor(getRandomMaterialColor("400"));
         options4.setPicture(R.drawable.bg_circle);
 
         optionsList.add(options4);
+
+       /* Options options3 = new Options();
+        options3.setId(3);
+        options3.setTitle("Filter Reports");
+        options3.setSubtitle("Query your reports");
+        options3.setColor(getRandomMaterialColor("400"));
+        options3.setPicture(R.drawable.bg_circle);
+
+        optionsList.add(options3);*/
 
 
         mAdapter.notifyDataSetChanged();
@@ -154,7 +150,7 @@ public class OptionsFragment extends Fragment implements  OptionsAdapter.Options
 
         if(position ==0){
             // setup the alert builder
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            /*AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Choose an option");
 
             // add a list
@@ -176,8 +172,8 @@ public class OptionsFragment extends Fragment implements  OptionsAdapter.Options
                            // Toast.makeText(getActivity(), "Exchange", Toast.LENGTH_SHORT).show();
                             Fragment fragmente = new CountyFragment();
                             getActivity().getSupportFragmentManager().beginTransaction()
-                /*.setCustomAnimations(R.anim.trans_left_in,
-                        R.anim.trans_left_out, R.anim.trans_right_in,R.anim.trans_right_out)*/
+                *//*.setCustomAnimations(R.anim.trans_left_in,
+                        R.anim.trans_left_out, R.anim.trans_right_in,R.anim.trans_right_out)*//*
                                     .remove(oldFragment)
                                     .replace(R.id.content, fragmente)
                                     .addToBackStack("Home")
@@ -189,24 +185,63 @@ public class OptionsFragment extends Fragment implements  OptionsAdapter.Options
 
             // create and show the alert dialog
             AlertDialog dialog = builder.create();
-            dialog.show();
+            dialog.show();*/
 
-        }else if(position == 1){
-            Fragment fragment  = new ReportFragment();
+            Fragment fragmente = new CountyFragment();
             getActivity().getSupportFragmentManager().beginTransaction()
+                /*.setCustomAnimations(R.anim.trans_left_in,
+                        R.anim.trans_left_out, R.anim.trans_right_in,R.anim.trans_right_out)*/
                     .remove(oldFragment)
-                    .replace(R.id.content, fragment)
+                    .replace(R.id.content, fragmente)
                     .addToBackStack("Home")
                     .commit();
+
+        }else if(position == 1){
+            // setup the alert builder
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Choose an option");
+
+            // add a list
+            String[] animals = {"List of reports", "Summary"};
+            builder.setItems(animals, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == 0) {
+                        //case 0: // local
+                        //Toast.makeText(getActivity(), "Local", Toast.LENGTH_SHORT).show();
+                        Fragment fragment  = new ReportFragment();
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .remove(oldFragment)
+                                .replace(R.id.content, fragment)
+                                .addToBackStack("Home")
+                                .commit();
+                    }else if(which == 1) {
+                        //case 1: // exchange
+                        // Toast.makeText(getActivity(), "Exchange", Toast.LENGTH_SHORT).show();
+                        Fragment fragment  = new SummariesFragment();
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .remove(oldFragment)
+                                .replace(R.id.content, fragment)
+                                .addToBackStack("Home")
+                                .commit();
+                    }
+
+                }
+            });
+
+            // create and show the alert dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
         }else if(position == 2){
-            Fragment fragment  = new OneFragmentLocal();
+            Fragment fragment  = new InternalProcessFragment();
             getActivity().getSupportFragmentManager().beginTransaction()
                     .remove(oldFragment)
                     .replace(R.id.content, fragment)
                     .addToBackStack("Home")
                     .commit();
         }else if(position == 3){
-            Fragment fragment  = new InternalProcessFragment();
+            Fragment fragment  = new SummariesFragment();
             getActivity().getSupportFragmentManager().beginTransaction()
                     .remove(oldFragment)
                     .replace(R.id.content, fragment)

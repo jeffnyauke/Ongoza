@@ -72,10 +72,7 @@ public class ThreeFragment extends Fragment {
                 @Override
                 public void execute(Realm realm) {
                     DataResponse dataResponse = realm.where(DataResponse.class).findFirstAsync();
-                    pdList = dataResponse.getPd();
-                    internalProcesses = dataResponse.getInternalProcess();
-                    populateSpinnerDelivering(pdList);
-                    populateInternalProcess(internalProcesses);
+
                 }
             });
         } finally {
