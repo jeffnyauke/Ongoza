@@ -6,6 +6,7 @@ package com.piestack.ongoza.app;
 
 public class Config {
 
+    //private static String mBaseUrl = "http://ongoza.piestack.co.ke/app/";
     private static String mBaseUrl = "http://data.ongozayouth.org/app/";
 
     public static String loginUrl = mBaseUrl + "login.php";

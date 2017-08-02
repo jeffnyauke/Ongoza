@@ -25,7 +25,7 @@
         android:paddingRight="@dimen/padding_list_row">
 
         <TextView
-            android:id="@+id/tvpartner"
+            android:id="@+id/tvsm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -38,14 +38,14 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvstheme"
+            android:id="@+id/tvpartner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
            android:maxLines="4"
             android:maxWidth="70dp"
             android:layout_weight=".2"
-            android:text="Product development and improvement"
+            android:text="4"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:textColor="@color/from"

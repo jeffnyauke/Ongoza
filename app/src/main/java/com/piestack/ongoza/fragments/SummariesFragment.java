@@ -73,12 +73,14 @@ public class SummariesFragment extends Fragment  {
     private DatePickerDialog datePickerDialogb;
     private Date beginning;
     private Date ending;
+    private int position = 0;
 
     //@BindView(R.id.spinner) Spinner sThemes;
     @BindView(R.id.search) Button button;
     @BindView(R.id.start_date) TextView startDate;
     @BindView(R.id.end_date) TextView endDate;
     @BindView(R.id.progressBar) ProgressBar progressBar;
+    @BindView(R.id.spinner) Spinner sParameter;
 
 
 
@@ -112,14 +114,20 @@ public class SummariesFragment extends Fragment  {
 
         getActivity().setTitle("Summary");
         progressBar.setVisibility(View.INVISIBLE);
-        //getActivity().getActionBar().setSubtitle();
 
-        /*OkHttpUtils
-                .get()//
-                .url(Config.themesUrl)//
-                .id(101)
-                .build()//
-                .execute(new MyStringCallback());*/
+        populateSpinnerParameter();
+
+        sParameter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                position = pos;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         begin = Calendar.getInstance();
         end = Calendar.getInstance();
@@ -208,9 +216,16 @@ public class SummariesFragment extends Fragment  {
 
                 if(isJSONValid(responses)){
                         successPosting(responses);
-//progressBar.setVisibility(View.INVISIBLE);
-                    Fragment fragment = new FilteredReportFragmentBuilder(responses).build();
-                    changeFragmentProcess(fragment);
+                        if(position == 0) {
+                            Fragment fragment = new FilteredReportPartnerFragmentBuilder(responses).build();
+                            changeFragmentProcess(fragment);
+                        }else if(position == 1){
+                            Fragment fragment = new FilteredReportFragmentBuilder(responses).build();
+                            changeFragmentProcess(fragment);
+                        }else if(position == 2){
+                            Fragment fragment = new FilteredReportSupportModeFragmentBuilder(responses).build();
+                            changeFragmentProcess(fragment);
+                        }
 
 
                 }else{
@@ -364,6 +379,26 @@ progressBar.setVisibility(View.INVISIBLE);
         }catch (JsonSyntaxException ex){
             return false;
         }
+    }
+
+    private void populateSpinnerParameter() {
+        List<String> lables = new ArrayList<String>();
+
+        lables.add("Partner");
+        lables.add("Support Theme");
+        lables.add("Support Mode");
+
+        // Creating adapter for spinner
+        final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, lables);
+
+        // Drop down layout style - list view with radio button
+        spinnerAdapter
+                .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+
+                sParameter.setAdapter(spinnerAdapter);
     }
 
 

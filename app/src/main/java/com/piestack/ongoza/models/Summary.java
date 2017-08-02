@@ -6,6 +6,7 @@ public class Summary {
     private String hrs_bds;
     private String hrs_travel;
     private String partners;
+    private String partnerName;
 
     public Summary() {
     }
@@ -48,5 +49,13 @@ public class Summary {
 
     public void setPartners(String partners) {
         this.partners = partners;
+    }
+
+    public String getPartnerName() {
+        return partnerName;
+    }
+
+    public void setPartnerName(String partnerName) {
+        this.partnerName = partnerName;
     }
 }
