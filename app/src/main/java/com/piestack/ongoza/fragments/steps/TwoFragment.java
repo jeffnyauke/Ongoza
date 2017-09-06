@@ -1,11 +1,8 @@
 package com.piestack.ongoza.fragments.steps;
 
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +14,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.florent37.singledateandtimepicker.dialog.DoubleDateAndTimePickerDialog;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.piestack.ongoza.R;
 import com.piestack.ongoza.app.Config;
 import com.piestack.ongoza.app.MyApplication;
 import com.piestack.ongoza.fragments.WeeklyFragment;
-import com.piestack.ongoza.models.Partner;
 import com.piestack.ongoza.models.PostResponse;
-import com.piestack.ongoza.models.data.County;
 import com.piestack.ongoza.models.data.DataResponse;
 import com.piestack.ongoza.models.data.InternalProcess;
 import com.piestack.ongoza.models.data.Modality;
@@ -38,13 +32,11 @@ import com.piestack.ongoza.models.data.SupportMode;
 import com.piestack.ongoza.models.data.SupportTheme;
 import com.piestack.ongoza.utils.General;
 import com.piestack.ongoza.utils.L;
+import com.piestack.ongoza.utils.Prefs;
 import com.piestack.ongoza.utils.StringUtils;
-
-import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -52,7 +44,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.realm.Realm;
-import io.realm.RealmResults;
 import okhttp3.Call;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -63,9 +54,6 @@ import okhttp3.Response;
 public class TwoFragment extends Fragment {
 
     private static final String ARGUMENT_NAME = "name";
-    private Unbinder unbinder;
-    private ReportResponse sortedResponses = null;
-    private Report report = null;
     @BindView(R.id.spinnerSM)
     Spinner sSupportMode;
     @BindView(R.id.spinnerFOE)
@@ -81,9 +69,15 @@ public class TwoFragment extends Fragment {
     @BindView(R.id.bdstype)
     TextView tvType;
     @BindView(R.id.county)
-    TextView tvCounty;@BindView(R.id.partner)
-    TextView tvPartner;@BindView(R.id.textViewPP)
+    TextView tvCounty;
+    @BindView(R.id.partner)
+    TextView tvPartner;
+    @BindView(R.id.textViewPP)
     TextView tPP;
+    @BindView(R.id.latitude)
+    TextView tvLatitude;
+    @BindView(R.id.longitude)
+    TextView tvLongitude;
     @BindView(R.id.tvTravel)
     EditText travel;
     @BindView(R.id.tvBDS)
@@ -93,9 +87,13 @@ public class TwoFragment extends Fragment {
     @BindView(R.id.progressBar2)
     ProgressBar progressBar;
     Realm realm = null;
-
+    private Unbinder unbinder;
+    private ReportResponse sortedResponses = null;
+    private Report report = null;
     private int timeBDS;
     private int timeTravel;
+    private String latitude;
+    private String longitude;
     private boolean sPPd = true;
     private String e_needs = "No emerging needs";
 
@@ -106,7 +104,8 @@ public class TwoFragment extends Fragment {
     private List<SupportTheme> supportThemes = null;
     private List<SubSupporttheme> subThemes = null;
 
-    private  String TAG = FourFragment.class.getSimpleName();
+    private String TAG = FourFragment.class.getSimpleName();
+
 
     public TwoFragment() {
         // Required empty public constructor
@@ -125,9 +124,8 @@ public class TwoFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_two, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-sPP.setVisibility(View.GONE);
-tPP.setVisibility(View.GONE);
-
+        sPP.setVisibility(View.GONE);
+        tPP.setVisibility(View.GONE);
 
 
         try { // I could use try-with-resources here
@@ -153,13 +151,18 @@ tPP.setVisibility(View.GONE);
                     sortedResponses = realm.where(ReportResponse.class).findFirstAsync();
                     report = sortedResponses.getReport().last();
 
-                    tvCounty.setText("County: "+report.getCountyName());
-                    tvPartner.setText("Partner: "+report.getPName());
-                    if(report.getExchange()){
+                    tvCounty.setText("County: " + report.getCountyName());
+                    tvPartner.setText("Partner: " + report.getPName());
+                    if (report.getExchange()) {
                         tvType.setText("Exchange");
-                    }else {
+                    } else {
                         tvType.setText("Local");
                     }
+
+                    latitude = Prefs.with(getContext()).getLatitude();
+                    longitude = Prefs.with(getContext()).getLongitude();
+                    tvLatitude.setText("Latitude: " + latitude);
+                    tvLongitude.setText("Longitude: " +longitude);
 
                 }
             });
@@ -183,8 +186,6 @@ tPP.setVisibility(View.GONE);
         }
 
 
-
-
         sDelivering.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -202,7 +203,7 @@ tPP.setVisibility(View.GONE);
                             DataResponse dataResponse = realm.where(DataResponse.class).findFirst();
                             pdList = dataResponse.getPd();
                             Pd pd = pdList.get(sDelivering.getSelectedItemPosition());
-                            if(pd.getPdId().equals("5") || pd.getPdId().equals("6")){
+                            if (pd.getPdId().equals("5") || pd.getPdId().equals("6")) {
                                 sPP.setVisibility(View.VISIBLE);
                                 tPP.setVisibility(View.VISIBLE);
 
@@ -220,13 +221,13 @@ tPP.setVisibility(View.GONE);
 
                                 // attaching data adapter to spinner
                                 sPP.setAdapter(spinnerAdapter);
-                            }else{
+                            } else {
                                 sPPd = false;
                             }
                         }
                     });
                 } finally {
-                    if(realm != null) {
+                    if (realm != null) {
                         realm.close();
                     }
                 }
@@ -235,8 +236,6 @@ tPP.setVisibility(View.GONE);
 
 
         });
-
-
 
 
         return view;
@@ -287,160 +286,156 @@ tPP.setVisibility(View.GONE);
     }*/
 
 
-
-
-
     @OnClick(R.id.next_two_weekly)
-    public void next(){
+    public void next() {
 
         final String travels = travel.getText().toString();
         final String hours = bds.getText().toString();
         final String needss = eneeds.getText().toString();
 
-        if (StringUtils.isNullorEmpty(travels) || StringUtils.isNullorEmpty(hours) || StringUtils.isNullorEmpty(needss)){
+        if (StringUtils.isNullorEmpty(travels) || StringUtils.isNullorEmpty(hours) || StringUtils.isNullorEmpty(needss)) {
             Toast.makeText(getActivity(), "Please fill in the empty fields", Toast.LENGTH_SHORT).show();
-        }else{
-        progressBar.setVisibility(View.VISIBLE);
+        } else {
+            progressBar.setVisibility(View.VISIBLE);
 
 
-        try { // I could use try-with-resources here
-            realm = Realm.getDefaultInstance();
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    DataResponse dataResponse = realm.where(DataResponse.class).findFirstAsync();
-                    sortedResponses = realm.where(ReportResponse.class).findFirstAsync();
-                    report = sortedResponses.getReport().last();
+            try { // I could use try-with-resources here
+                realm = Realm.getDefaultInstance();
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        DataResponse dataResponse = realm.where(DataResponse.class).findFirstAsync();
+                        sortedResponses = realm.where(ReportResponse.class).findFirstAsync();
+                        report = sortedResponses.getReport().last();
 
-                    Modality modality = dataResponse.getModality().get(sFOE.getSelectedItemPosition());
-                    SupportMode supportMode = dataResponse.getSupportMode().get(sSupportMode.getSelectedItemPosition());
-                    SupportTheme supportTheme = dataResponse.getSupportTheme().get(sSupport.getSelectedItemPosition());
-                    SubSupporttheme subSupporttheme = dataResponse.getSubSupporttheme().get(sSubSupport.getSelectedItemPosition());
-                    report.setSubId(subSupporttheme.getSubId());
-                    report.setSId(supportTheme.getSId());
-                    report.setModalityId(modality.getModalityId());
-                    report.setModeId(supportMode.getModeId());
-                    Pd pd = dataResponse.getPd().get(sDelivering.getSelectedItemPosition());
-                    //InternalProcess internalProcess = dataResponse.getInternalProcess().get(sInternalProcess.getSelectedItemPosition());
-                    report.setPdId(pd.getPdId());
-                    //report.setOipId(internalProcess.getOipId());
+                        Modality modality = dataResponse.getModality().get(sFOE.getSelectedItemPosition());
+                        SupportMode supportMode = dataResponse.getSupportMode().get(sSupportMode.getSelectedItemPosition());
+                        SupportTheme supportTheme = dataResponse.getSupportTheme().get(sSupport.getSelectedItemPosition());
+                        SubSupporttheme subSupporttheme = dataResponse.getSubSupporttheme().get(sSubSupport.getSelectedItemPosition());
+                        report.setSubId(subSupporttheme.getSubId());
+                        report.setSId(supportTheme.getSId());
+                        report.setModalityId(modality.getModalityId());
+                        report.setModeId(supportMode.getModeId());
+                        Pd pd = dataResponse.getPd().get(sDelivering.getSelectedItemPosition());
+                        //InternalProcess internalProcess = dataResponse.getInternalProcess().get(sInternalProcess.getSelectedItemPosition());
+                        report.setPdId(pd.getPdId());
+                        //report.setOipId(internalProcess.getOipId());
 
-                    report.setTravel(StringUtils.isNullorEmpty(travels) ? "0": travels);
-                    report.setHoursIp(StringUtils.isNullorEmpty(hours) ? "0": hours);
-                    report.setE_needs(StringUtils.isNullorEmpty(needss) ? "0": needss);
-                }
-            });
-        } finally {
-            if(realm != null) {
-                realm.close();
-            }
-        }
-        try { // I could use try-with-resources here
-            realm = Realm.getDefaultInstance();
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    sortedResponses = realm.where(ReportResponse.class).findFirstAsync();
-                    report = sortedResponses.getReport().last();
-
-                    final String sppdd;
-                    if(sPPd){
-                        sppdd = StringUtils.isNullorEmpty(sPP.getSelectedItem().toString()) ? "No" : sPP.getSelectedItem().toString();
-
-                    }else{
-
-                        sppdd = "No";
+                        report.setTravel(StringUtils.isNullorEmpty(travels) ? "0" : travels);
+                        report.setHoursIp(StringUtils.isNullorEmpty(hours) ? "0" : hours);
+                        report.setE_needs(StringUtils.isNullorEmpty(needss) ? "0" : needss);
                     }
+                });
+            } finally {
+                if (realm != null) {
+                    realm.close();
+                }
+            }
+            try { // I could use try-with-resources here
+                realm = Realm.getDefaultInstance();
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        sortedResponses = realm.where(ReportResponse.class).findFirstAsync();
+                        report = sortedResponses.getReport().last();
 
-                    RequestBody formBody = new FormBody.Builder()
-                            .add("id", MyApplication.getInstance().getPrefManager().getUser().getId().toString())
-                            .add("county_id",report.getCountyId())
-                            .add("exchange",report.getExchange() ? String.valueOf(1):String.valueOf(0))
-                            .add("modality_id",report.getModalityId())
-                            .add("oip_id","2")
-                            .add("p_id",report.getPId())
-                            .add("pd_id",report.getPdId())
-                            .add("mode_id",report.getModeId())
-                            .add("sub_id",report.getSubId())
-                            .add("s_id",report.getSId())
-                            .add("travel",report.getTravel())
-                            .add("e_needs",report.getE_needs())
-                            .add("present", sppdd)
-                            .add("hours_ip",report.getHoursIp())
-                            .build();
+                        final String sppdd;
+                        if (sPPd) {
+                            sppdd = StringUtils.isNullorEmpty(sPP.getSelectedItem().toString()) ? "No" : sPP.getSelectedItem().toString();
 
-                    OkHttpClient client = new OkHttpClient();
+                        } else {
 
-                    Request request = new Request.Builder()
-                            .url(Config.postUrl)
-                            .post(formBody)
-                            .build();
+                            sppdd = "No";
+                        }
 
-                    try{
-                        client.newCall(request).enqueue(new okhttp3.Callback() {
-                            @Override
-                            public void onFailure(Call call, IOException e) {
-                                L.e(TAG, e.getMessage());
+                        RequestBody formBody = new FormBody.Builder()
+                                .add("id", MyApplication.getInstance().getPrefManager().getUser().getId().toString())
+                                .add("county_id", report.getCountyId())
+                                .add("exchange", report.getExchange() ? String.valueOf(1) : String.valueOf(0))
+                                .add("modality_id", report.getModalityId())
+                                .add("oip_id", "2")
+                                .add("p_id", report.getPId())
+                                .add("pd_id", report.getPdId())
+                                .add("mode_id", report.getModeId())
+                                .add("sub_id", report.getSubId())
+                                .add("s_id", report.getSId())
+                                .add("travel", report.getTravel())
+                                .add("e_needs", report.getE_needs())
+                                .add("present", sppdd)
+                                .add("hours_ip", report.getHoursIp())
+                                .add("longitude", longitude)
+                                .add("latitude", latitude)
+                                .build();
+
+                        OkHttpClient client = new OkHttpClient();
+
+                        Request request = new Request.Builder()
+                                .url(Config.postUrl)
+                                .post(formBody)
+                                .build();
+
+                        try {
+                            client.newCall(request).enqueue(new okhttp3.Callback() {
+                                @Override
+                                public void onFailure(Call call, IOException e) {
+                                    L.e(TAG, e.getMessage());
 
 
-                                //progressBar.setVisibility(View.INVISIBLE);
-                                errorPosting();
-                                General.backgroundThreadShortToast(getActivity(), "Check your internet connection");
-                            }
-
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-
-                                String responses = response.body().string();
-                                L.e(TAG,responses);
-                                L.json(TAG,responses);
-
-                                //progressBar.setVisibility(View.INVISIBLE);
-                                if(isJSONValid(responses)){
-                                    Gson gson = new Gson();
-                                    PostResponse postResponse =  gson.fromJson(responses,PostResponse.class);
-
-                                    if(!postResponse.getError()) {
-                                        //Toast.makeText(getActivity(), "Posted succesfully!", Toast.LENGTH_SHORT).show();
-                                        successPosting();
-                                        General.backgroundThreadShortToast(getActivity(), "Posted succesfully!");
-
-                                    }else{
-
-                                        //progressBar.setVisibility(View.INVISIBLE);
-                                        errorPosting();
-                                        //Toast.makeText(getActivity(), "Submission unsuccessful", Toast.LENGTH_SHORT).show();
-                                        L.e(TAG, postResponse.getErrorMsg());
-                                        General.backgroundThreadShortToast(getActivity(), "Submission unsuccessful");
-                                    }
-                                }else {
+                                    //progressBar.setVisibility(View.INVISIBLE);
                                     errorPosting();
-                                    General.backgroundThreadShortToast(getActivity(), "Submission unsuccessful");
+                                    General.backgroundThreadShortToast(getActivity(), "Check your internet connection");
                                 }
 
+                                @Override
+                                public void onResponse(Call call, Response response) throws IOException {
+
+                                    String responses = response.body().string();
+                                    L.e(TAG, responses);
+                                    L.json(TAG, responses);
+
+                                    //progressBar.setVisibility(View.INVISIBLE);
+                                    if (isJSONValid(responses)) {
+                                        Gson gson = new Gson();
+                                        PostResponse postResponse = gson.fromJson(responses, PostResponse.class);
+
+                                        if (!postResponse.getError()) {
+                                            //Toast.makeText(getActivity(), "Posted succesfully!", Toast.LENGTH_SHORT).show();
+                                            successPosting();
+                                            General.backgroundThreadShortToast(getActivity(), "Posted succesfully!");
+
+                                        } else {
+
+                                            //progressBar.setVisibility(View.INVISIBLE);
+                                            errorPosting();
+                                            //Toast.makeText(getActivity(), "Submission unsuccessful", Toast.LENGTH_SHORT).show();
+                                            L.e(TAG, postResponse.getErrorMsg());
+                                            General.backgroundThreadShortToast(getActivity(), "Submission unsuccessful");
+                                        }
+                                    } else {
+                                        errorPosting();
+                                        General.backgroundThreadShortToast(getActivity(), "Submission unsuccessful");
+                                    }
 
 
+                                }
+                            });
 
 
-                            }
-                        });
-
-
-                    }catch (Exception e){
-                        e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
+                });
+            } finally {
+                if (realm != null) {
+                    realm.close();
                 }
-            });
-        } finally {
-            if(realm != null) {
-                realm.close();
             }
-        }
 
         }
     }
 
-    private void changeFragmentProcess(Fragment fragment){
+    private void changeFragmentProcess(Fragment fragment) {
 
         /*getActivity().getSupportFragmentManager().beginTransaction()
                 *//*.setCustomAnimations(R.anim.trans_left_in,
@@ -460,7 +455,6 @@ tPP.setVisibility(View.GONE);
                 .commit();
 
     }
-
 
 
     private void populateSpinnerSupportMode(List<SupportMode> list) {
@@ -484,7 +478,7 @@ tPP.setVisibility(View.GONE);
 
     /**
      * Adding spinner data
-     * */
+     */
     private void populateSpinnerEngagement(List<Modality> modalities) {
         List<String> lables = new ArrayList<String>();
 
@@ -506,7 +500,7 @@ tPP.setVisibility(View.GONE);
 
     /**
      * Adding spinner data
-     * */
+     */
     private void populateSpinnerDelivering(List<Pd> pds) {
         List<String> lables = new ArrayList<String>();
         for (int i = 0; i < pds.size(); i++) {
@@ -548,23 +542,23 @@ tPP.setVisibility(View.GONE);
 
     /**
      * Adding spinner data
-     * */
+     */
     private void populateSpinnerSubSupportTheme(List<SubSupporttheme> list) {
         List<String> lables = new ArrayList<String>();
         List<SubSupporttheme> filtered = new ArrayList<>();
-        if(list != null) {
+        if (list != null) {
             for (SubSupporttheme subSupporttheme : list) {
-                if (Integer.valueOf(subSupporttheme.getSId()) == Integer.valueOf(supportThemes.get(sSupport.getSelectedItemPosition()).getSId())){
+                if (Integer.valueOf(subSupporttheme.getSId()) == Integer.valueOf(supportThemes.get(sSupport.getSelectedItemPosition()).getSId())) {
                     filtered.add(subSupporttheme);
                 }
             }
         }
 
-        if(filtered.isEmpty()) {
+        if (filtered.isEmpty()) {
             for (int i = 0; i < list.size(); i++) {
                 lables.add(list.get(i).getSubName());
             }
-        }else{
+        } else {
             for (int i = 0; i < filtered.size(); i++) {
                 lables.add(filtered.get(i).getSubName());
             }
@@ -628,9 +622,8 @@ tPP.setVisibility(View.GONE);
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }*/
-
     @OnClick(R.id.next_two_weekly)
-    public void movetwo(){
+    public void movetwo() {
         /*Fragment fragment = new ThreeFragment();
         changeFragmentProcess(fragment,true);
         MainActivity.changeFragmentProcess()*/
@@ -638,28 +631,29 @@ tPP.setVisibility(View.GONE);
 
     // When binding a fragment in onCreateView, set the views to null in onDestroyView.
     // ButterKnife returns an Unbinder on the initial binding that has an unbind method to do this automatically.
-    @Override public void onDestroyView() {
+    @Override
+    public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
     }
 
 
-    public boolean isJSONValid(String test){
-        try{
+    public boolean isJSONValid(String test) {
+        try {
             Gson gson = new Gson();
             gson.fromJson(test, PostResponse.class);
-            return  true;
-        }catch (JsonSyntaxException ex){
+            return true;
+        } catch (JsonSyntaxException ex) {
             return false;
         }
     }
 
-    private void errorPosting(){
+    private void errorPosting() {
         Fragment fragment = new ThanksFragmentBuilder("Could not post your Report right now! Will be saved as draft.").build();
         changeFragmentProcess(fragment);
     }
 
-    private void successPosting(){
+    private void successPosting() {
         Fragment fragment = new ThanksFragmentBuilder("Your Report has been submitted successfully!").build();
         changeFragmentProcess(fragment);
     }

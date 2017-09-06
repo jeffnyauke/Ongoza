@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -28,6 +29,7 @@ import com.piestack.ongoza.models.data.Report;
 import com.piestack.ongoza.models.data.ReportResponse;
 import com.piestack.ongoza.utils.General;
 import com.piestack.ongoza.utils.L;
+import com.piestack.ongoza.utils.Prefs;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -56,6 +58,10 @@ public class InternalProcessFragment extends Fragment {
     EditText eneeds;
     @BindView(R.id.progressBar2)
     ProgressBar progressBar;
+    @BindView(R.id.latitude)
+    TextView tvLatitude;
+    @BindView(R.id.longitude)
+    TextView tvLongitude;
     @BindView(R.id.submit_weekly)
     Button button;
     @BindView(R.id.spinner)
@@ -67,6 +73,8 @@ public class InternalProcessFragment extends Fragment {
     private ReportResponse sortedResponses = null;
     private List<InternalProcess> internalProcesses = null;
     private Report report = null;
+    private String latitude;
+    private String longitude;
 
     private  String TAG = InternalProcessFragment.class.getSimpleName();
 
@@ -100,6 +108,11 @@ public class InternalProcessFragment extends Fragment {
         AppBarLayout layout =(AppBarLayout) getActivity().findViewById(R.id.appbar);
         //getActivity().getActionBar().setSubtitle();
 
+        latitude = Prefs.with(getContext()).getLatitude();
+        longitude = Prefs.with(getContext()).getLongitude();
+        tvLatitude.setText("Latitude: " + latitude);
+        tvLongitude.setText("Longitude: " +longitude);
+
         OkHttpUtils
                 .get()//
                 .url(Config.dataUrl)//
@@ -122,6 +135,8 @@ public class InternalProcessFragment extends Fragment {
                             .add("oip_id",internalProcess.getOipId())
                             .add("e_needs",e_needs)
                             .add("hours_ip",hourz)
+                            .add("longitude",longitude)
+                            .add("latitude",latitude)
                             .build();
 
                     OkHttpClient client = new OkHttpClient();
